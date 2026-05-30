@@ -1,105 +1,110 @@
-# Dart MQTT Broker
+# dart_mqtt_broker
 
-A MQTT Broker written in Dart.
+A pure-Dart MQTT 3.1.1 broker.
 
-## Overview
+## Features
 
-`dart_mqtt_broker` is a MQTT server implementation written entirely in Dart. Designed for lightweight applications, it supports MQTT versions 3.1.1 and 5.0 and is optimized for ease of integration. This project is under active development, with new features and improvements being added regularly.
+- **Full MQTT 3.1.1**: CONNECT, PUBLISH, SUBSCRIBE, UNSUBSCRIBE, PINGREQ, DISCONNECT and all ACK packets.
+- **QoS 0, 1, and 2** with full inbound and outbound state machines.
+- **Wildcard subscriptions** (`+` single-level, `#` multi-level).
+- **Retained messages** with replay to new subscribers; empty payload clears.
+- **Will messages** published on abnormal disconnect.
+- **Pluggable authentication** via the `MqttAuthenticator` interface.
+- **Session takeover** when a client reconnects with the same identifier.
+- **Persistent sessions** (`cleanSession = false`): subscriptions and queued QoS 1/2 messages survive disconnect in memory.
+- **Keep-alive enforcement** at 1.5× the negotiated interval.
+- **TLS support** via `MqttBroker.tls(...)`.
+- **Stream-based event API** for connect, disconnect, subscribe, unsubscribe, publish.
 
+> Not implemented in this release: MQTT 5.0, WebSocket transport, on-disk session persistence.
 
-## Getting Started
+## Install
 
-### Prerequisites
+```yaml
+dependencies:
+  dart_mqtt_broker: ^2.0.0
+```
 
-- Dart SDK version 3.5.3 or higher
-
-### Installation
-
-1. Clone the repository:
-    ```sh
-    git clone https://github.com/elrizwiraswara/dart_mqtt_broker.git
-    cd dart_mqtt_broker
-    ```
-
-2. Install as dependency in `pubspec.yaml`
-    ```yaml
-    dart_mqtt_broker: 
-      git:
-        url: https://github.com/elrizwiraswara/dart_mqtt_broker
-    ```
-
-## Basic Example Usage
-
-Here is a basic example of how to use the MQTT broker:
+## Basic example
 
 ```dart
-import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
+import 'package:dart_mqtt_broker/dart_mqtt_broker.dart';
 
-import 'package:dart_mqtt_broker/mqtt_broker.dart';
-import 'package:dart_mqtt_broker/client.dart';
-// import 'package:msgpack_dart/msgpack_dart.dart';
-
-void main() async {
-  // Start the MQTT Broker
-  final broker = MqttBroker(address: InternetAddress.anyIPv4.address, port: 1883);
-  await broker.start();
-  print('MQTT Broker is running...');
-
-  List<Client> connectedClients = [];
-
-  // Listen to connected client
-  broker.onClientConnectListener((Client client) {
-    connectedClients.add(client);
-    print('Connected client: ${client.clientId}');
-  });
-  
-  // Listen to disconnected client
-  broker.onClientDisconnectListener((Client client) {
-    connectedClients.remove(client);
-    print('Disconnected client: ${client.clientId}');
-  });
-  
-  // Listen to topic subscribed
-  broker.onTopicSubscribedListener((String topic, int count) {
-    print('Topic subscribed: $topic, subscriber count: $count');
-  });
-  
-  // Listen to message published
-  broker.onMessagePublishedListener((String topic, int qos, Uint8List payload) {
-    final decodedPayload = utf8.decode(payload);
-    // final decodedPayload = deserialize(payload); // MessagePack
-    print('Message published: topic: $topic, qos: $qos, payload: $decodedPayload');
-  });
-  
-  String text = "Hello, World!";
-  Uint8List bytesData = Uint8List.fromList(utf8.encode(text));
-  // You can also use MessagePack if needed
-  // Uint8List bytesData = serialize(text);
-
-  // Publish a message
-  broker.publishMessage(
-    '/topic/mytopic', // Topic
-    0, // QoS
-    bytesData, // Payload
+Future<void> main() async {
+  final broker = MqttBroker(
+    address: InternetAddress.anyIPv4.address,
+    port: 1883,
   );
 
-  // Disconnect client
-  for (var client in connectedClients) {
-    await broker.disconnectClient(client);
-  }
-  
-  // Stop the broker
-  await broker.stop();
+  broker.onConnect.listen((e) => print('Connected: ${e.clientId}'));
+  broker.onDisconnect.listen((e) => print('Disconnected: ${e.clientId}'));
+  broker.onSubscribe.listen((e) => print('Subscribed: ${e.clientId} -> ${e.filter}'));
+  broker.onPublish.listen((e) => print('Published: ${e.topic}'));
+
+  await broker.start();
 }
+```
+
+## TLS
+
+```dart
+final ctx = SecurityContext()
+  ..useCertificateChain('cert.pem')
+  ..usePrivateKey('key.pem');
+
+final broker = MqttBroker.tls(
+  address: '0.0.0.0',
+  port: 8883,
+  context: ctx,
+);
+await broker.start();
+```
+
+## Authentication
+
+```dart
+class MyAuth extends MqttAuthenticator {
+  @override
+  Future<MqttAuthResult> authenticate({
+    required String clientId,
+    String? username,
+    Uint8List? password,
+  }) async {
+    if (username == 'admin' && _checkPassword(password)) {
+      return const MqttAuthResult.accept();
+    }
+    return const MqttAuthResult.reject(MqttConnectReturnCode.badUsernameOrPassword);
+  }
+}
+
+final broker = MqttBroker(
+  address: '0.0.0.0',
+  authenticator: MyAuth(),
+);
+```
+
+## Publishing from the broker
+
+```dart
+broker.publish(
+  'sensors/heartbeat',
+  Uint8List.fromList(utf8.encode('ok')),
+  qos: 1,
+  retain: false,
+);
+```
+
+## Forcibly disconnect a client
+
+```dart
+await broker.disconnectClient('clientId');
 ```
 
 ## Contributing
 
-Contributions are welcome! Please open an issue or submit a pull request.
+Issues and pull requests are welcome at [github.com/elrizwiraswara/dart_mqtt_broker](https://github.com/elrizwiraswara/dart_mqtt_broker). For bug reports, please include the broker version, a minimal reproduction (client code + the packet flow if possible), and the broker log output. New features should come with tests under `test/` — the integration suite uses `mqtt_client` as a real MQTT client and is the easiest place to verify protocol behavior end-to-end.
 
 ## License
 
-This project is licensed under the MIT License.
-
+Released under the [MIT License](LICENSE).
