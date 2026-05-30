@@ -134,7 +134,7 @@ await broker.disconnectClient('clientId');
 
 ## Contributing
 
-Issues and pull requests are welcome at [github.com/elrizwiraswara/dart_mqtt_broker](https://github.com/elrizwiraswara/dart_mqtt_broker). For bug reports, please include the broker version, a minimal reproduction (client code plus the packet flow if possible), and the broker log output. New features should come with tests under `test/`. The integration suite uses `mqtt_client` as a real MQTT client and is the easiest place to verify protocol behavior end-to-end.
+Issues and pull requests are welcome at [github.com/elrizwiraswara/mqtt_broker_lite](https://github.com/elrizwiraswara/mqtt_broker_lite). For bug reports, please include the broker version, a minimal reproduction (client code plus the packet flow if possible), and the broker log output. New features should come with tests under `test/`. The integration suite uses `mqtt_client` as a real MQTT client and is the easiest place to verify protocol behavior end-to-end.
 
 ## License
 
