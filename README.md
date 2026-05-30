@@ -12,9 +12,9 @@ A pure-Dart MQTT 3.1.1 broker.
 - **Pluggable authentication** via the `MqttAuthenticator` interface.
 - **Session takeover** when a client reconnects with the same identifier.
 - **Persistent sessions** (`cleanSession = false`): subscriptions and queued QoS 1/2 messages survive disconnect in memory.
-- **Keep-alive enforcement** at 1.5× the negotiated interval.
+- **Keep-alive enforcement** at 1.5x the negotiated interval.
 - **TLS support** via `MqttBroker.tls(...)`.
-- **WebSocket transport** via `MqttBroker.ws(...)` and `MqttBroker.wss(...)` — enables browser-based MQTT clients.
+- **WebSocket transport** via `MqttBroker.ws(...)` and `MqttBroker.wss(...)` for browser-based MQTT clients.
 - **Stream-based event API** for connect, disconnect, subscribe, unsubscribe, publish.
 
 > Not implemented in this release: MQTT 5.0, on-disk session persistence.
@@ -30,6 +30,7 @@ dependencies:
 
 ```dart
 import 'dart:io';
+
 import 'package:mqtt_broker_lite/mqtt_broker_lite.dart';
 
 Future<void> main() async {
@@ -59,6 +60,7 @@ final broker = MqttBroker.tls(
   port: 8883,
   context: ctx,
 );
+
 await broker.start();
 ```
 
@@ -71,6 +73,7 @@ final broker = MqttBroker.ws(
   address: '0.0.0.0',
   port: 8080,
 );
+
 await broker.start();
 ```
 
@@ -82,10 +85,11 @@ final broker = MqttBroker.wss(
   port: 8443,
   context: ctx,
 );
+
 await broker.start();
 ```
 
-You can run multiple brokers in the same process (e.g., plain TCP on 1883 *and* WebSocket on 8080) — they share nothing by default. If you want them to share sessions and topics, route through a single `MqttBroker` instance; otherwise instantiate one per port.
+You can run multiple brokers in the same process (e.g. plain TCP on 1883 and WebSocket on 8080). They share nothing by default. If you want them to share sessions and topics, route through a single `MqttBroker` instance; otherwise instantiate one per port.
 
 ## Authentication
 
@@ -100,6 +104,7 @@ class MyAuth extends MqttAuthenticator {
     if (username == 'admin' && _checkPassword(password)) {
       return const MqttAuthResult.accept();
     }
+
     return const MqttAuthResult.reject(MqttConnectReturnCode.badUsernameOrPassword);
   }
 }
@@ -129,7 +134,7 @@ await broker.disconnectClient('clientId');
 
 ## Contributing
 
-Issues and pull requests are welcome at [github.com/elrizwiraswara/dart_mqtt_broker](https://github.com/elrizwiraswara/dart_mqtt_broker). For bug reports, please include the broker version, a minimal reproduction (client code + the packet flow if possible), and the broker log output. New features should come with tests under `test/` — the integration suite uses `mqtt_client` as a real MQTT client and is the easiest place to verify protocol behavior end-to-end.
+Issues and pull requests are welcome at [github.com/elrizwiraswara/dart_mqtt_broker](https://github.com/elrizwiraswara/dart_mqtt_broker). For bug reports, please include the broker version, a minimal reproduction (client code plus the packet flow if possible), and the broker log output. New features should come with tests under `test/`. The integration suite uses `mqtt_client` as a real MQTT client and is the easiest place to verify protocol behavior end-to-end.
 
 ## License
 
