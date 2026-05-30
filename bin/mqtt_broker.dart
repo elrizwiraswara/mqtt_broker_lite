@@ -1,58 +1,38 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
-import 'package:dart_mqtt_broker/client.dart';
-import 'package:dart_mqtt_broker/mqtt_broker.dart';
+import 'package:dart_mqtt_broker/dart_mqtt_broker.dart';
 
-void main() async {
-  // Start the MQTT Broker
-  final broker = MqttBroker(address: InternetAddress.anyIPv4.address, port: 1883);
+Future<void> main() async {
+  final broker = MqttBroker(
+    address: InternetAddress.anyIPv4.address,
+    port: 1883,
+  );
+
+  broker.onConnect.listen((e) => print('Connected: ${e.clientId}'));
+  broker.onDisconnect.listen((e) => print('Disconnected: ${e.clientId} (graceful=${e.graceful})'));
+  broker.onSubscribe.listen((e) => print('Subscribe: ${e.clientId} -> ${e.filter} qos=${e.grantedQos}'));
+  broker.onUnsubscribe.listen((e) => print('Unsubscribe: ${e.clientId} -> ${e.filter}'));
+  broker.onPublish.listen((e) {
+    final preview = _previewPayload(e.payload);
+    print('Publish: ${e.clientId ?? "broker"} -> ${e.topic} qos=${e.qos} retain=${e.retain} payload=$preview');
+  });
+
   await broker.start();
-  print('MQTT Broker is running...');
+  print('MQTT Broker running on ${broker.address}:${broker.port}');
 
-  List<Client> connectedClients = [];
-
-  // Listen to connected client
-  broker.onClientConnectListener((Client client) {
-    connectedClients.add(client);
-    print('Connected client: ${client.clientId}');
+  ProcessSignal.sigint.watch().listen((_) async {
+    print('\nShutting down...');
+    await broker.stop();
+    exit(0);
   });
+}
 
-  // Listen to disconnected client
-  broker.onClientDisconnectListener((Client client) {
-    connectedClients.remove(client);
-    print('Disconnected client: ${client.clientId}');
-  });
-
-  // Listen to topic subscribed
-  broker.onTopicSubscribedListener((String topic, int count) {
-    print('Topic subscribed: $topic, subscriber count: $count');
-  });
-
-  // Listen to message published
-  broker.onMessagePublishedListener((String topic, int qos, Uint8List payload) {
-    final decodedPayload = utf8.decode(payload);
-    print('Message published: topic: $topic, qos: $qos, payload: $decodedPayload');
-  });
-
-  // String text = "Hello, World!";
-  // // You can also use MessagePack if needed
-  // // Uint8List bytesData = serialize(text);
-  // Uint8List uint8List = Uint8List.fromList(utf8.encode(text));
-
-  // // Publish a message
-  // broker.publishMessage(
-  //   '/topic/mytopic', // Topic
-  //   0, // QoS
-  //   uint8List, // Bytes data
-  // );
-
-  // // Disconnect client
-  // for (var client in connectedClients) {
-  //   await broker.disconnectClient(client);
-  // }
-
-  // // Stop the broker
-  // await broker.stop();
+String _previewPayload(List<int> payload) {
+  try {
+    final text = utf8.decode(payload, allowMalformed: false);
+    return '"$text"';
+  } catch (_) {
+    return '<${payload.length} bytes>';
+  }
 }
