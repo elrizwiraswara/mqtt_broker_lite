@@ -1,8 +1,10 @@
 ## 2.1.0
 
+First release under the name `mqtt_broker_lite`. Previously developed in a private repository as `dart_mqtt_broker`.
+
 ### New
-- `MqttBroker.ws(...)` — MQTT-over-WebSocket transport (default port 8080).
-- `MqttBroker.wss(...)` — MQTT-over-WebSocket-over-TLS transport (default port 8443).
+- `MqttBroker.ws(...)`: MQTT-over-WebSocket transport (default port 8080).
+- `MqttBroker.wss(...)`: MQTT-over-WebSocket-over-TLS transport (default port 8443).
 - Pluggable `MqttTransport` abstraction; `TcpTransport`, `WebSocketTransport`.
 
 ### Changed
@@ -15,7 +17,7 @@ Complete rewrite. The broker is now a real MQTT 3.1.1 implementation.
 ### Breaking changes
 - New `Stream`-based event API replaces `onXxxListener` callbacks. See README.
 - The `Client` class is replaced by `MqttSession` (read-only view of a connected client).
-- Library entry point is now `package:dart_mqtt_broker/dart_mqtt_broker.dart`.
+- Library entry point is now `package:mqtt_broker_lite/mqtt_broker_lite.dart`.
 
 ### New
 - Streaming TCP packet reassembler (fixes packet fragmentation / batching bug).

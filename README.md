@@ -1,4 +1,4 @@
-# dart_mqtt_broker
+# mqtt_broker_lite
 
 A pure-Dart MQTT 3.1.1 broker.
 
@@ -23,14 +23,14 @@ A pure-Dart MQTT 3.1.1 broker.
 
 ```yaml
 dependencies:
-  dart_mqtt_broker: ^2.1.0
+  mqtt_broker_lite: ^2.1.0
 ```
 
 ## Basic example
 
 ```dart
 import 'dart:io';
-import 'package:dart_mqtt_broker/dart_mqtt_broker.dart';
+import 'package:mqtt_broker_lite/mqtt_broker_lite.dart';
 
 Future<void> main() async {
   final broker = MqttBroker(

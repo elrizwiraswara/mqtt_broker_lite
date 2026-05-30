@@ -1,4 +1,4 @@
-import 'package:dart_mqtt_broker/src/topic/topic_filter.dart';
+import 'package:mqtt_broker_lite/src/topic/topic_filter.dart';
 import 'package:test/test.dart';
 
 void main() {

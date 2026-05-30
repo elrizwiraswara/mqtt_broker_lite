@@ -5,8 +5,8 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:dart_mqtt_broker/dart_mqtt_broker.dart';
-import 'package:dart_mqtt_broker/src/codec/packets.dart';
+import 'package:mqtt_broker_lite/mqtt_broker_lite.dart';
+import 'package:mqtt_broker_lite/src/codec/packets.dart';
 import 'package:mqtt_client/mqtt_client.dart';
 import 'package:mqtt_client/mqtt_server_client.dart';
 import 'package:test/test.dart';

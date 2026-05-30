@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 
-import 'package:dart_mqtt_broker/src/codec/packet_reader.dart';
-import 'package:dart_mqtt_broker/src/codec/packet_type.dart';
-import 'package:dart_mqtt_broker/src/codec/packets.dart';
+import 'package:mqtt_broker_lite/src/codec/packet_reader.dart';
+import 'package:mqtt_broker_lite/src/codec/packet_type.dart';
+import 'package:mqtt_broker_lite/src/codec/packets.dart';
 import 'package:test/test.dart';
 
 void main() {

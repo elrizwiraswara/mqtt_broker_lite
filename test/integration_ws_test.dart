@@ -5,9 +5,9 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:dart_mqtt_broker/dart_mqtt_broker.dart';
-import 'package:dart_mqtt_broker/src/codec/packet_reader.dart';
-import 'package:dart_mqtt_broker/src/codec/packets.dart';
+import 'package:mqtt_broker_lite/mqtt_broker_lite.dart';
+import 'package:mqtt_broker_lite/src/codec/packet_reader.dart';
+import 'package:mqtt_broker_lite/src/codec/packets.dart';
 import 'package:test/test.dart';
 
 Future<int> _freePort() async {

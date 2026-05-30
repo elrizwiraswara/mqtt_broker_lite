@@ -1,4 +1,4 @@
-name: dart_mqtt_broker
+name: mqtt_broker_lite
 description: A pure-Dart MQTT 3.1.1 broker. Supports wildcards, retained messages, QoS 0/1/2, will messages, authentication, TLS, and WebSocket transport.
 version: 2.1.0
 homepage: https://github.com/elrizwiraswara/dart_mqtt_broker

@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:dart_mqtt_broker/dart_mqtt_broker.dart';
+import 'package:mqtt_broker_lite/mqtt_broker_lite.dart';
 
 Future<void> main() async {
   final broker = MqttBroker(

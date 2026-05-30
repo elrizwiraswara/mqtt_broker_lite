@@ -1,4 +1,4 @@
-import 'package:dart_mqtt_broker/src/codec/variable_byte_int.dart';
+import 'package:mqtt_broker_lite/src/codec/variable_byte_int.dart';
 import 'package:test/test.dart';
 
 void main() {
