@@ -1,3 +1,13 @@
+## 2.1.0
+
+### New
+- `MqttBroker.ws(...)` — MQTT-over-WebSocket transport (default port 8080).
+- `MqttBroker.wss(...)` — MQTT-over-WebSocket-over-TLS transport (default port 8443).
+- Pluggable `MqttTransport` abstraction; `TcpTransport`, `WebSocketTransport`.
+
+### Changed
+- Internal `ClientConnection` now drives any `MqttTransport`, not just a raw `Socket`. The public broker API is unchanged.
+
 ## 2.0.0
 
 Complete rewrite. The broker is now a real MQTT 3.1.1 implementation.

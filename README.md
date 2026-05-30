@@ -14,15 +14,16 @@ A pure-Dart MQTT 3.1.1 broker.
 - **Persistent sessions** (`cleanSession = false`): subscriptions and queued QoS 1/2 messages survive disconnect in memory.
 - **Keep-alive enforcement** at 1.5× the negotiated interval.
 - **TLS support** via `MqttBroker.tls(...)`.
+- **WebSocket transport** via `MqttBroker.ws(...)` and `MqttBroker.wss(...)` — enables browser-based MQTT clients.
 - **Stream-based event API** for connect, disconnect, subscribe, unsubscribe, publish.
 
-> Not implemented in this release: MQTT 5.0, WebSocket transport, on-disk session persistence.
+> Not implemented in this release: MQTT 5.0, on-disk session persistence.
 
 ## Install
 
 ```yaml
 dependencies:
-  dart_mqtt_broker: ^2.0.0
+  dart_mqtt_broker: ^2.1.0
 ```
 
 ## Basic example
@@ -60,6 +61,31 @@ final broker = MqttBroker.tls(
 );
 await broker.start();
 ```
+
+## WebSocket
+
+For browser clients (Paho JS, MQTT.js, `mqtt_browser_client`) that speak MQTT-over-WebSocket. Defaults to path `/mqtt`.
+
+```dart
+final broker = MqttBroker.ws(
+  address: '0.0.0.0',
+  port: 8080,
+);
+await broker.start();
+```
+
+WebSocket-over-TLS uses the same `SecurityContext` as `MqttBroker.tls`:
+
+```dart
+final broker = MqttBroker.wss(
+  address: '0.0.0.0',
+  port: 8443,
+  context: ctx,
+);
+await broker.start();
+```
+
+You can run multiple brokers in the same process (e.g., plain TCP on 1883 *and* WebSocket on 8080) — they share nothing by default. If you want them to share sessions and topics, route through a single `MqttBroker` instance; otherwise instantiate one per port.
 
 ## Authentication
 
