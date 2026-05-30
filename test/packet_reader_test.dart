@@ -15,13 +15,14 @@ void main() {
       ).encode();
 
       final reader = PacketReader();
-      // Feed byte-by-byte.
+
       for (final b in pkt) {
         reader.addBytes([b]);
-        // Most feeds yield nothing; only the last byte completes the packet.
       }
+
       final raws = reader.readPackets();
       expect(raws, hasLength(1));
+
       final decoded = PublishPacket.decode(raws.single.firstByte, raws.single.body);
       expect(decoded.topic, 'a/b');
       expect(decoded.payload.length, 200);
@@ -35,6 +36,7 @@ void main() {
 
       final reader = PacketReader();
       reader.addBytes(builder.takeBytes());
+
       final raws = reader.readPackets();
       expect(raws.map((r) => r.type).toList(), [
         MqttPacketType.pingreq,
@@ -48,12 +50,10 @@ void main() {
       final second = DisconnectPacket().encode();
       final reader = PacketReader();
 
-      // First chunk: first packet + 1 byte of second.
       reader.addBytes([...first, second[0]]);
       var raws = reader.readPackets();
       expect(raws, hasLength(1));
 
-      // Second chunk: remaining byte of second.
       reader.addBytes([second[1]]);
       raws = reader.readPackets();
       expect(raws, hasLength(1));
@@ -61,6 +61,7 @@ void main() {
 
     test('rejects oversize buffer', () {
       final reader = PacketReader(maxBufferedBytes: 8);
+
       expect(() => reader.addBytes(List.filled(16, 0)), throwsStateError);
     });
   });

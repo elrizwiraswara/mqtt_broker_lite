@@ -11,11 +11,15 @@ Future<void> main() async {
 
   broker.onConnect.listen((e) => print('Connected: ${e.clientId}'));
   broker.onDisconnect.listen((e) => print('Disconnected: ${e.clientId} (graceful=${e.graceful})'));
-  broker.onSubscribe.listen((e) => print('Subscribe: ${e.clientId} -> ${e.filter} qos=${e.grantedQos}'));
+  broker.onSubscribe.listen(
+    (e) => print('Subscribe: ${e.clientId} -> ${e.filter} qos=${e.grantedQos}'),
+  );
   broker.onUnsubscribe.listen((e) => print('Unsubscribe: ${e.clientId} -> ${e.filter}'));
   broker.onPublish.listen((e) {
     final preview = _previewPayload(e.payload);
-    print('Publish: ${e.clientId ?? "broker"} -> ${e.topic} qos=${e.qos} retain=${e.retain} payload=$preview');
+    print(
+      'Publish: ${e.clientId ?? "broker"} -> ${e.topic} qos=${e.qos} retain=${e.retain} payload=$preview',
+    );
   });
 
   await broker.start();

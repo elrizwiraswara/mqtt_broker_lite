@@ -18,7 +18,9 @@ class PrintMqttLogger extends MqttLogger {
   @override
   void log(MqttLogLevel level, String message, [Object? error, StackTrace? stack]) {
     if (level.index < minLevel.index || minLevel == MqttLogLevel.none) return;
+
     final prefix = '[MqttBroker][${level.name.toUpperCase()}]';
+
     if (error != null) {
       print('$prefix $message: $error');
       if (stack != null) print(stack);

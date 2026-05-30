@@ -18,6 +18,7 @@ void main() {
       for (final v in [0, 1, 127, 128, 16383, 16384, 2097151, 2097152, 268435455]) {
         final bytes = VariableByteInt.encode(v);
         final decoded = VariableByteInt.decode(bytes, 0);
+
         expect(decoded, isNotNull);
         expect(decoded!.value, v, reason: 'value=$v');
         expect(decoded.bytesConsumed, bytes.length);

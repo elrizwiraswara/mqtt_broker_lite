@@ -2,7 +2,7 @@ import 'package:dart_mqtt_broker/src/topic/topic_filter.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group('TopicFilter.matches — single level (+)', () {
+  group('TopicFilter.matches single-level (+)', () {
     test('+ matches exactly one level', () {
       expect(TopicFilter.matches('sport/+/player1', 'sport/tennis/player1'), isTrue);
       expect(TopicFilter.matches('sport/+/player1', 'sport/player1'), isFalse);
@@ -20,7 +20,7 @@ void main() {
     });
   });
 
-  group('TopicFilter.matches — multi-level (#)', () {
+  group('TopicFilter.matches multi-level (#)', () {
     test('# matches zero or more remaining levels', () {
       expect(TopicFilter.matches('sport/#', 'sport'), isTrue);
       expect(TopicFilter.matches('sport/#', 'sport/tennis'), isTrue);
@@ -34,7 +34,7 @@ void main() {
     });
   });
 
-  group(r'TopicFilter.matches — $-topics', () {
+  group(r'TopicFilter.matches $-topics', () {
     test('# at root does not match \$SYS', () {
       expect(TopicFilter.matches('#', r'$SYS/clients'), isFalse);
     });

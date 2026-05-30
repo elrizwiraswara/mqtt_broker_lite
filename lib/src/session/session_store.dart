@@ -10,5 +10,6 @@ class SessionStore {
   MqttSession? remove(String clientId) => _byClientId.remove(clientId);
 
   Iterable<MqttSession> get all => _byClientId.values;
+
   int get size => _byClientId.length;
 }

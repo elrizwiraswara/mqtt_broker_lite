@@ -5,6 +5,18 @@ import 'package:dart_mqtt_broker/src/codec/packet_type.dart';
 import 'package:dart_mqtt_broker/src/codec/packets.dart';
 import 'package:test/test.dart';
 
+/// Encodes a packet, runs it through a [PacketReader], and returns the
+/// resulting [RawPacket].
+RawPacket _toRaw(Uint8List encoded) {
+  final reader = PacketReader();
+  reader.addBytes(encoded);
+
+  final raws = reader.readPackets();
+  expect(raws, hasLength(1));
+
+  return raws.single;
+}
+
 void main() {
   group('CONNECT', () {
     test('round-trips MQTT 3.1.1 with all options', () {
@@ -21,8 +33,10 @@ void main() {
         willQos: 1,
         willRetain: true,
       );
+
       final raw = _toRaw(pkt.encode());
       final decoded = ConnectPacket.decode(raw.firstByte, raw.body);
+
       expect(decoded.protocolName, 'MQTT');
       expect(decoded.protocolLevel, 4);
       expect(decoded.clientId, 'client-42');
@@ -45,9 +59,11 @@ void main() {
         qos: 0,
         retain: true,
       );
+
       final raw = _toRaw(pkt.encode());
       expect(raw.firstByte & 0xF0, 0x30);
-      expect(raw.firstByte & 0x01, 0x01); // retain
+      expect(raw.firstByte & 0x01, 0x01);
+
       final decoded = PublishPacket.decode(raw.firstByte, raw.body);
       expect(decoded.topic, 'a/b');
       expect(decoded.qos, 0);
@@ -63,8 +79,10 @@ void main() {
         dup: true,
         packetId: 7,
       );
+
       final raw = _toRaw(pkt.encode());
       final decoded = PublishPacket.decode(raw.firstByte, raw.body);
+
       expect(decoded.qos, 2);
       expect(decoded.dup, isTrue);
       expect(decoded.packetId, 7);
@@ -81,6 +99,7 @@ void main() {
       ]) {
         final pkt = cons(0x1234);
         final raw = _toRaw(pkt.encode());
+
         switch (pkt) {
           case PubAckPacket _:
             expect(PubAckPacket.decode(raw.firstByte, raw.body).packetId, 0x1234);
@@ -95,7 +114,6 @@ void main() {
     });
 
     test('PUBREL flags must be 0010', () {
-      // Wire with wrong flags (0x60 instead of 0x62).
       expect(
         () => PubRelPacket.decode(0x60, Uint8List.fromList([0x00, 0x01])),
         throwsA(isA<FormatException>()),
@@ -112,8 +130,10 @@ void main() {
           const SubscribeTopic('c/#', 2),
         ],
       );
+
       final raw = _toRaw(pkt.encode());
       final decoded = SubscribePacket.decode(raw.firstByte, raw.body);
+
       expect(decoded.packetId, 9);
       expect(decoded.topics.map((t) => t.filter), ['a/b', 'c/#']);
       expect(decoded.topics.map((t) => t.qos), [0, 2]);
@@ -122,6 +142,7 @@ void main() {
     test('SUBACK encodes return codes', () {
       final pkt = SubAckPacket(packetId: 9, returnCodes: [0, 1, 2, subAckFailure]);
       final raw = _toRaw(pkt.encode());
+
       expect(raw.firstByte, 0x90);
       expect(raw.body, [0x00, 0x09, 0, 1, 2, subAckFailure]);
     });
@@ -130,6 +151,7 @@ void main() {
       final pkt = UnsubscribePacket(packetId: 5, topics: ['a/b', 'c/#']);
       final raw = _toRaw(pkt.encode());
       final decoded = UnsubscribePacket.decode(raw.firstByte, raw.body);
+
       expect(decoded.packetId, 5);
       expect(decoded.topics, ['a/b', 'c/#']);
     });
@@ -146,18 +168,9 @@ void main() {
       for (final firstByte in [0x30, 0x31, 0x32, 0x33, 0x38, 0x39, 0x3A, 0x3B]) {
         expect(MqttPacketType.fromFirstByte(firstByte), MqttPacketType.publish);
       }
+
       expect(MqttPacketType.fromFirstByte(0xA2), MqttPacketType.unsubscribe);
       expect(MqttPacketType.fromFirstByte(0x82), MqttPacketType.subscribe);
     });
   });
-}
-
-/// Helper: takes a full encoded packet, peels off the fixed header, and
-/// returns a [RawPacket] for the body (mirrors what [PacketReader] yields).
-RawPacket _toRaw(Uint8List encoded) {
-  final reader = PacketReader();
-  reader.addBytes(encoded);
-  final raws = reader.readPackets();
-  expect(raws, hasLength(1));
-  return raws.single;
 }

@@ -16,11 +16,14 @@ enum MqttPacketType {
   disconnect(14);
 
   const MqttPacketType(this.code);
+
   final int code;
 
   static MqttPacketType fromFirstByte(int firstByte) {
     final code = (firstByte & 0xF0) >> 4;
+
     if (code < 0 || code > 14) return MqttPacketType.reserved;
+
     return MqttPacketType.values[code];
   }
 }
@@ -34,6 +37,7 @@ enum MqttConnectReturnCode {
   notAuthorized(5);
 
   const MqttConnectReturnCode(this.code);
+
   final int code;
 }
 
