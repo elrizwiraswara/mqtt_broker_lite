@@ -1,3 +1,8 @@
+## 2.1.1
+
+### Fixed
+- Updated `homepage` and `repository` URLs in `pubspec.yaml` to point to the `mqtt_broker_lite` GitHub repository.
+
 ## 2.1.0
 
 First release under the name `mqtt_broker_lite`. Previously developed in a private repository as `dart_mqtt_broker`.

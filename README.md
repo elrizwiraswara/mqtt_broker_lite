@@ -23,7 +23,7 @@ A pure-Dart MQTT 3.1.1 broker.
 
 ```yaml
 dependencies:
-  mqtt_broker_lite: ^2.1.0
+  mqtt_broker_lite: ^2.1.1
 ```
 
 ## Basic example
